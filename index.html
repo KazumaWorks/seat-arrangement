@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html {
+            background-color: #D5F4FF;
+        }
+
+        form {
+            margin: 3dvh 0;
+            padding: 0 1dvw;
+        }
+
+        .students {
+            height: 45dvh;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .students li {
+            padding: 3px 0;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            margin: 50px;
+        }
+
+        .seat {
+            height: 50px;
+            border: 1px solid black;
+            background-color: white;
+            display: grid;
+            place-items: center;
+        }
+
+        .disabled {
+            background-color: gray;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 30px;
+            height: 3px;
+            margin: 6px 0;
+            background: black;
+        }
+
+        main {
+            text-align: center;
+            display: grid;
+            grid-template-columns: 0 1fr;
+        }
+
+        aside {
+            overflow: hidden;
+            background-color: white;
+        }
+
+        main.show {
+            grid-template-columns: 3fr 13fr;
+        }
+
+        input {
+            width: 85%;
+            height: 20px;
+            text-align: center;
+        }
+
+        select {
+            text-align: center;
+        }
+
+        .count {
+            display: none;
+        }
+
+        .count.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <main class="show">
+        <aside>
+            <form>
+                <select name="gender" required>
+                    <option value="">性別を選択</option>
+                    <option value="male">男性</option>
+                    <option value="female">女性</option>
+                </select>
+                <input type="text" name="name">
+                <button type="submit" class="count"></button>
+            </form>
+
+            <button>前列優先</button>
+            <button>後列優先</button>
+            <button class="confirm" hidden>確定</button>
+            <button class="cancel" hidden>キャンセル</button>
+
+            <ul class="students">
+            </ul>
+            
+            <button class="delete">削除</button>
+        </aside>
+
+        <section id="LaLa901">
+            <!-- 前の席 -->
+            <div class="row">
+                <div class="seat"></div>
+                <div class="seat"></div>
+                <div class="seat"></div>
+
+                <div class="aisle"></div>
+
+                <div class="seat"></div>
+                <div class="seat"></div>
+                <div class="seat"></div>
+
+                <div class="aisle"></div>
+
+                <div class="seat"></div>
+                <div class="seat"></div>
+            </div>
+
+            <!-- 真ん中の席 -->
+            <div class="row">
+                <div class="seat"></div>
+                <div class="seat"></div>
+                <div class="seat"></div>
+
+                <div class="aisle"></div>
+
+                <div class="seat"></div>
+                <div class="seat"></div>
+                <div class="seat"></div>
+
+                <div class="aisle"></div>
+
+                <div class="seat"></div>
+                <div class="seat"></div>
+            </div>
+
+            <!-- 後ろの席 -->
+            <div class="row">
+                <div class="seat"></div>
+                <div class="seat"></div>
+                <div class="seat"></div>
+
+                <div class="aisle"></div>
+
+                <div class="seat"></div>
+                <div class="seat"></div>
+                <div class="seat"></div>
+
+                <div class="aisle"></div>
+
+                <div class="seat"></div>
+                <div class="seat"></div>
+            </div>
+
+            <div>
+                <button type="button" class="reset">リセット</button><br>
+                <button type="button" class="shuffle">席替え</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="count show">
+        男性:<span class="maleCount"></span>名
+        　女性:<span class="femaleCount"></span>名
+        　合計:<span class="totalCount"></span>名
+    </div>
+
+    <script src="Seat.js"></script>
+    <script src="Student.js"></script>
+    <script src="List.js"></script>
+
+    <script src="uncategorized.js"></script>
+
+    <script>
+        let List = load();
+        count();
+
+        function count() {
+            let maleCount = 0;
+            let femaleCount = 0;
+            
+            for (const student of List) {
+                if (student.gender === "male") {
+                    maleCount++;
+                }
+                if (student.gender === "female") {
+                    femaleCount++;
+                }
+            }
+            
+            document.querySelector(".maleCount").textContent = maleCount;
+            document.querySelector(".femaleCount").textContent = femaleCount;
+            document.querySelector(".totalCount").textContent = List.length;
+        }
+
+        const menuBtn = document.querySelector(".hamburger");
+        const elements = document.querySelectorAll("main, .count");
+        menuBtn.addEventListener("click", () => {
+            elements.forEach(element => {
+                element.classList.toggle("show");
+            })
+        })
+
+        const deleteBtn = document.querySelector(".delete");
+        const cancelBtn = document.querySelector(".cancel");
+        const allBtn = document.querySelectorAll("button:not(.hamburger)");
+
+        deleteBtn.addEventListener("click", () => {
+            allBtn.forEach(Btn => {
+                Btn.toggleAttribute("hidden");
+            })
+        })
+
+        cancelBtn.addEventListener("click", () => {
+            allBtn.forEach(Btn => {
+                Btn.toggleAttribute("hidden");
+            })
+        })
+
+        //HTMLに出力
+        const ul = document.querySelector(".students");
+
+
+        //実行
+        const text = document.querySelector('input[name="name"]');
+        const form = document.querySelector("form");
+
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            addName();
+            printName();
+        })
+
+        document.querySelector(".reset").addEventListener("click", () => {
+            localStorage.clear();
+            location.reload();
+        })
+
+        // seats.forEach((seat) => {
+        //     seat.addEventListener("click", () => {
+        //         seat.textContent = "";
+        //         seat.classList.toggle("disabled");
+        //     })
+        // })
+
+        const sekigae = document.querySelector(".shuffle");
+        sekigae.addEventListener("click", () => {
+            seats.forEach(seat => {
+                seat.vacate();
+            })
+            shuffle(ableSeat);
+            for (let i = 0; i < List.length; i++) {
+                ableSeat[i].occupy(List[i]);
+            }
+        })
+
+        const seats = [];
+
+        document.querySelectorAll(".row")
+            .forEach((rowElement, row) => {
+                rowElement.querySelectorAll(".seat")
+                    .forEach(seatElement => {
+                        seats.push(new Seat(seatElement, row));
+                    })
+            })
+
+        let ableSeat = [];
+
+        seats.forEach(Seat => {
+            if (Seat.user == null) {
+                ableSeat.push(Seat);
+            }
+        });
+
+        function shuffle(array) {
+            for (i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        printName();
+    </script>
+</body>
+
+</html>
