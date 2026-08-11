@@ -18,7 +18,8 @@
         .students {
             height: 45dvh;
             overflow-y: auto;
-            padding: 0;
+            padding: 10px 0;
+            border: 1px solid black;
         }
 
         .students li {
@@ -59,6 +60,7 @@
 
         aside {
             overflow: hidden;
+            padding: 10px;
             background-color: white;
         }
 
@@ -82,6 +84,16 @@
 
         .count.show {
             display: block;
+        }
+
+        li button:disabled {
+            border: none;
+            background-color: transparent;
+            color: inherit;
+        }
+
+        .selected {
+            background-color: lightgreen;
         }
     </style>
 </head>
@@ -112,7 +124,7 @@
 
             <ul class="students">
             </ul>
-            
+
             <button class="delete">削除</button>
         </aside>
 
@@ -172,7 +184,7 @@
             </div>
 
             <div>
-                <button type="button" class="reset">リセット</button><br>
+                <button type="button" class="reset">動作テスト用ボタン(押すと初期化されます)</button><br>
                 <button type="button" class="shuffle">席替え</button>
             </div>
         </section>
@@ -197,7 +209,7 @@
         function count() {
             let maleCount = 0;
             let femaleCount = 0;
-            
+
             for (const student of List) {
                 if (student.gender === "male") {
                     maleCount++;
@@ -206,7 +218,7 @@
                     femaleCount++;
                 }
             }
-            
+
             document.querySelector(".maleCount").textContent = maleCount;
             document.querySelector(".femaleCount").textContent = femaleCount;
             document.querySelector(".totalCount").textContent = List.length;
@@ -222,15 +234,45 @@
 
         const deleteBtn = document.querySelector(".delete");
         const cancelBtn = document.querySelector(".cancel");
+        const confirmBtn = document.querySelector(".confirm");
         const allBtn = document.querySelectorAll("button:not(.hamburger)");
 
         deleteBtn.addEventListener("click", () => {
             allBtn.forEach(Btn => {
                 Btn.toggleAttribute("hidden");
             })
+            document.querySelectorAll("li button").forEach((button) => {
+                button.disabled = false;
+                button.addEventListener("click", () => {
+                    button.classList.toggle("selected");
+                })
+            })
         })
 
         cancelBtn.addEventListener("click", () => {
+            allBtn.forEach(Btn => {
+                Btn.toggleAttribute("hidden");
+            })
+            printName();
+        })
+
+        confirmBtn.addEventListener("click", () => {
+            const selectedIndexs = [];
+
+            document.querySelectorAll("li button").forEach((element, index) => {
+                if (element.classList.contains("selected")) {
+                    selectedIndexs.push(index);
+                }
+            })
+
+            List = List.filter((student, index) => {
+                return !selectedIndexs.includes(index);
+            })
+
+            save(List);
+            printName();
+            count();
+
             allBtn.forEach(Btn => {
                 Btn.toggleAttribute("hidden");
             })

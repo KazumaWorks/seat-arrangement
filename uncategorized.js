@@ -8,6 +8,7 @@ function printName() {
         ul.appendChild(li);
         li.classList.add("name");
         button.textContent = name;
+        button.disabled = true;
     })
 }
 
