@@ -203,26 +203,8 @@
     <script src="uncategorized.js"></script>
 
     <script>
-        let List = load();
-        count();
-
-        function count() {
-            let maleCount = 0;
-            let femaleCount = 0;
-
-            for (const student of List) {
-                if (student.gender === "male") {
-                    maleCount++;
-                }
-                if (student.gender === "female") {
-                    femaleCount++;
-                }
-            }
-
-            document.querySelector(".maleCount").textContent = maleCount;
-            document.querySelector(".femaleCount").textContent = femaleCount;
-            document.querySelector(".totalCount").textContent = List.length;
-        }
+        let List = load("List");
+        countStudents();
 
         const menuBtn = document.querySelector(".hamburger");
         const elements = document.querySelectorAll("main, .count");
@@ -253,25 +235,14 @@
             allBtn.forEach(Btn => {
                 Btn.toggleAttribute("hidden");
             })
-            printName();
+            displayStudents();
         })
 
         confirmBtn.addEventListener("click", () => {
-            const selectedIndexs = [];
-
-            document.querySelectorAll("li button").forEach((element, index) => {
-                if (element.classList.contains("selected")) {
-                    selectedIndexs.push(index);
-                }
-            })
-
-            List = List.filter((student, index) => {
-                return !selectedIndexs.includes(index);
-            })
-
-            save(List);
-            printName();
-            count();
+            removeStudents();
+            save(List, "List");
+            displayStudents();
+            countStudents();
 
             allBtn.forEach(Btn => {
                 Btn.toggleAttribute("hidden");
@@ -289,20 +260,13 @@
         form.addEventListener("submit", (e) => {
             e.preventDefault();
             addName();
-            printName();
+            displayStudents();
         })
 
         document.querySelector(".reset").addEventListener("click", () => {
             localStorage.clear();
             location.reload();
         })
-
-        // seats.forEach((seat) => {
-        //     seat.addEventListener("click", () => {
-        //         seat.textContent = "";
-        //         seat.classList.toggle("disabled");
-        //     })
-        // })
 
         const sekigae = document.querySelector(".shuffle");
         sekigae.addEventListener("click", () => {
@@ -328,7 +292,7 @@
         let ableSeat = [];
 
         seats.forEach(Seat => {
-            if (Seat.user == null) {
+            if (Seat.status == null) {
                 ableSeat.push(Seat);
             }
         });
@@ -340,7 +304,7 @@
             }
         }
 
-        printName();
+        displayStudents();
     </script>
 </body>
 
