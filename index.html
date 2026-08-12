@@ -38,6 +38,7 @@
             background-color: white;
             display: grid;
             place-items: center;
+            user-select: none;
         }
 
         .disabled {
@@ -60,7 +61,6 @@
 
         aside {
             overflow: hidden;
-            padding: 10px;
             background-color: white;
         }
 
@@ -94,6 +94,14 @@
 
         .selected {
             background-color: lightgreen;
+        }
+
+        .unabled {
+            background-color: gray;
+        }
+
+        .ladies {
+            background-color: #FCE1E1;
         }
     </style>
 </head>
@@ -272,11 +280,8 @@
             })
         })
 
-        //HTMLに出力
         const ul = document.querySelector(".students");
 
-
-        //実行
         const text = document.querySelector('input[name="name"]');
         const form = document.querySelector("form");
 
@@ -293,56 +298,83 @@
 
         const sekigae = document.querySelector(".shuffle");
         sekigae.addEventListener("click", () => {
-            if (List.length > seats.length) {
-                alert("人数が多すぎます");
-                return;
-            }
             seats.forEach(seat => {
                 seat.vacate();
             })
-            let ableSeat = [];
 
-            const frontSeat = seats.filter(seat => {
+            const ableSeats = seats.filter(seat => {
+                return seat.status === null;
+            })
+
+            if (List.length > ableSeats.length) {
+                alert("人数が多すぎます");
+                return;
+            }
+
+            // const frontLadiesSeats = ableSeats.filter(seat => {
+            //     return (seat.row === 0 && seat.type === "ladies");
+            // });
+            // shuffle(frontLadiesSeats);
+            // let i = 0;
+            // List.forEach(student => {
+            //     if ((student.priority === "front" && student.gender === "female")) {
+            //         frontLadiesSeats[i].occupy(student);
+            //         i++;
+            //     }
+            // })
+
+            // const frontSeats = ableSeats.filter(seat => {
+            //     return (seat.row === 0 && seat.status === null);
+            // })
+            // shuffle(frontSeats);
+            // let j = 0;
+            // List.forEach(student => {
+            //     if ((student.priority === "front" && student.gender === "male")) {
+            //         frontSeats[j].occupy(student);
+            //         j++;
+            //     }
+            // })
+
+            const frontSeat = ableSeats.filter(seat => {
                 return seat.row === 0;
             });
             shuffle(frontSeat);
             let i = 0;
-            List.forEach((student) => {
+            List.forEach(student => {
                 if (student.priority === "front") {
                     frontSeat[i].occupy(student);
                     i++;
                 }
             })
-            
-            const backSeat = seats.filter(seat => {
+
+            const backSeat = ableSeats.filter(seat => {
                 return seat.row === 2;
             });
             shuffle(backSeat);
             let k = 0;
-            List.forEach((student) => {
+            List.forEach(student => {
                 if (student.priority === "back") {
                     backSeat[k].occupy(student);
                     k++;
                 }
             })
 
+            let freeSeats = [];
+
             seats.forEach(Seat => {
                 if (Seat.status == null) {
-                    ableSeat.push(Seat);
+                    freeSeats.push(Seat);
                 }
             });
 
-            shuffle(ableSeat);
-            let j = 0;
+            shuffle(freeSeats);
+            let m = 0;
             List.forEach((student) => {
                 if (student.priority === null) {
-                    ableSeat[j].occupy(student);
-                    j++;
+                    freeSeats[m].occupy(student);
+                    m++;
                 }
             })
-            // for (let i = 0; i < List.length; i++) {
-            //     ableSeat[i].occupy(List[i]);
-            // }
         })
 
         const seats = [];
@@ -351,7 +383,11 @@
             .forEach((rowElement, row) => {
                 rowElement.querySelectorAll(".seat")
                     .forEach(seatElement => {
-                        seats.push(new Seat(seatElement, row));
+                        const seat = new Seat(seatElement, row)
+                        seats.push(seat);
+                        seatElement.addEventListener("click", () => {
+                            seat.changeType();
+                        })
                     })
             })
 

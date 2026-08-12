@@ -4,6 +4,7 @@ class Student {
         this.gender = gender;
 
         this.priority = null;
+        this.status = null;
     }
 
     //ここに書く
