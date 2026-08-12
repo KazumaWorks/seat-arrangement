@@ -117,15 +117,15 @@
                 <button type="submit" class="count"></button>
             </form>
 
-            <button>前列優先</button>
-            <button>後列優先</button>
+            <button data-mode="front">前列優先</button>
+            <button data-mode="back">後列優先</button>
             <button class="confirm" hidden>確定</button>
             <button class="cancel" hidden>キャンセル</button>
 
             <ul class="students">
             </ul>
 
-            <button class="delete">削除</button>
+            <button data-mode="remove">削除</button>
         </aside>
 
         <section id="LaLa901">
@@ -214,38 +214,61 @@
             })
         })
 
-        const deleteBtn = document.querySelector(".delete");
         const cancelBtn = document.querySelector(".cancel");
         const confirmBtn = document.querySelector(".confirm");
-        const allBtn = document.querySelectorAll("button:not(.hamburger)");
+        const otherButtons = document.querySelectorAll("button:not(.hamburger)");
+        const modeButtons = document.querySelectorAll("[data-mode]");
+        let mode = null;
 
-        deleteBtn.addEventListener("click", () => {
-            allBtn.forEach(Btn => {
-                Btn.toggleAttribute("hidden");
-            })
-            document.querySelectorAll("li button").forEach((button) => {
-                button.disabled = false;
-                button.addEventListener("click", () => {
-                    button.classList.toggle("selected");
+        modeButtons.forEach(modeButton => {
+            modeButton.addEventListener("click", () => {
+                mode = modeButton.dataset.mode;
+                otherButtons.forEach(button => {
+                    button.toggleAttribute("hidden");
+                })
+                const nameButtons = document.querySelectorAll("li button");
+                nameButtons.forEach((button) => {
+                    button.disabled = false;
+                    button.addEventListener("click", () => {
+                        button.classList.toggle("selected");
+                    })
+                })
+                List.forEach((student, index) => {
+                    if (student.priority === mode) {
+                        nameButtons[index].classList.add("selected");
+                    }
                 })
             })
         })
 
         cancelBtn.addEventListener("click", () => {
-            allBtn.forEach(Btn => {
-                Btn.toggleAttribute("hidden");
+            otherButtons.forEach(button => {
+                button.toggleAttribute("hidden");
             })
             displayStudents();
         })
 
         confirmBtn.addEventListener("click", () => {
-            removeStudents();
+            const selectedIndexes = [];
+            selectStudents(selectedIndexes);
+
+            switch (mode) {
+                case "front":
+                    setPriority(selectedIndexes, mode);
+                    break;
+                case "back":
+                    setPriority(selectedIndexes, mode);
+                    break;
+                case "remove":
+                    removeStudents(selectedIndexes);
+                    countStudents();
+                    break;
+            }
+
             save(List, "List");
             displayStudents();
-            countStudents();
-
-            allBtn.forEach(Btn => {
-                Btn.toggleAttribute("hidden");
+            otherButtons.forEach(button => {
+                button.toggleAttribute("hidden");
             })
         })
 
@@ -270,13 +293,56 @@
 
         const sekigae = document.querySelector(".shuffle");
         sekigae.addEventListener("click", () => {
+            if (List.length > seats.length) {
+                alert("人数が多すぎます");
+                return;
+            }
             seats.forEach(seat => {
                 seat.vacate();
             })
+            let ableSeat = [];
+
+            const frontSeat = seats.filter(seat => {
+                return seat.row === 0;
+            });
+            shuffle(frontSeat);
+            let i = 0;
+            List.forEach((student) => {
+                if (student.priority === "front") {
+                    frontSeat[i].occupy(student);
+                    i++;
+                }
+            })
+            
+            const backSeat = seats.filter(seat => {
+                return seat.row === 2;
+            });
+            shuffle(backSeat);
+            let k = 0;
+            List.forEach((student) => {
+                if (student.priority === "back") {
+                    backSeat[k].occupy(student);
+                    k++;
+                }
+            })
+
+            seats.forEach(Seat => {
+                if (Seat.status == null) {
+                    ableSeat.push(Seat);
+                }
+            });
+
             shuffle(ableSeat);
-            for (let i = 0; i < List.length; i++) {
-                ableSeat[i].occupy(List[i]);
-            }
+            let j = 0;
+            List.forEach((student) => {
+                if (student.priority === null) {
+                    ableSeat[j].occupy(student);
+                    j++;
+                }
+            })
+            // for (let i = 0; i < List.length; i++) {
+            //     ableSeat[i].occupy(List[i]);
+            // }
         })
 
         const seats = [];
@@ -289,16 +355,9 @@
                     })
             })
 
-        let ableSeat = [];
-
-        seats.forEach(Seat => {
-            if (Seat.status == null) {
-                ableSeat.push(Seat);
-            }
-        });
 
         function shuffle(array) {
-            for (i = array.length - 1; i > 0; i--) {
+            for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }

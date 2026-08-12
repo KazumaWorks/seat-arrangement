@@ -22,13 +22,26 @@ function countStudents() {
     document.querySelector(".totalCount").textContent = List.length;
 }
 
-function removeStudents() {
-    const selectedIndexes = [];
+function selectStudents(selectedIndexes) {
     document.querySelectorAll("li button").forEach((element, index) => {
         if (element.classList.contains("selected")) {
             selectedIndexes.push(index);
         }
     })
+}
+
+function setPriority(selectedIndexes, mode) {
+    List.forEach(student => {
+        if (student.priority === mode) {
+            student.priority = null;
+        }
+    })
+    selectedIndexes.forEach(i => {
+        List[i].priority = mode;
+    })
+}
+
+function removeStudents(selectedIndexes) {
     List = List.filter((student, index) => {
         return !selectedIndexes.includes(index);
     })
@@ -38,8 +51,8 @@ function displayStudents() {
     const students = List.map(student => {
         const li = document.createElement("li");
         const button = document.createElement("button");
+        button.textContent = student.name;
         button.disabled = true;
-        li.textContent = student.name;
         li.appendChild(button);
         return li;
     })

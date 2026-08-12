@@ -7,8 +7,8 @@ class Seat {
         this.status = null;
     }
 
-    occupy(Student) {
-        this.element.textContent = Student.name;
+    occupy(student) {
+        this.element.textContent = student.name;
         this.status = "unavailable";
     }
 
