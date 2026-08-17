@@ -8,23 +8,19 @@ class Seat {
     }
 
     changeType() {
-        this.element.textContent = "";
-
-        const types = [null, "ladies", "unabled"];
-
+        const types = [null, "ladies", "disabled"];
         const currentIndex = types.indexOf(this.type);
         const nextIndex = (currentIndex + 1) % types.length;
-
+        
         this.type = types[nextIndex];
-
-        if (this.type === "unabled") {
+        this.element.textContent = null;
+        if (this.type === "disabled") {
             this.status = "unavailable";
         } else {
             this.status = null;
         }
 
-        this.element.classList.remove("ladies", "unabled");
-
+        this.element.classList.remove("ladies", "disabled");
         if (this.type !== null) {
             this.element.classList.add(this.type);
         }
@@ -37,7 +33,7 @@ class Seat {
 
     vacate() {
         this.element.textContent = null;
-        if (this.type !== "unabled") {
+        if (this.type !== "disabled") {
             this.status = null;
         }
     }

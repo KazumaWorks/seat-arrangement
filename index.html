@@ -6,43 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        html {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
             background-color: #D5F4FF;
         }
 
+        main {
+            display: grid;
+            grid-template-columns: 0 1fr;
+            text-align: center;
+        }
+
+        main.show {
+            grid-template-columns: 3fr 13fr;
+        }
+
+        aside {
+            height: 83vh;
+            padding-block: 1vh;
+            overflow: hidden;
+            background-color: white;
+        }
+
         form {
-            margin: 3dvh 0;
-            padding: 0 1dvw;
+            margin: 0 2vh 2vh;
+        }
+
+        input {
+            text-align: center;
+            width: 80%;
+            height: 5vh;
+            margin: 1vh 1vw;
         }
 
         .students {
-            height: 45dvh;
+            height: 60%;
+            margin: 1vh 0;
+            padding: 1vh 0;
+            border-block: 1px solid black;
+            list-style: none;
             overflow-y: auto;
-            padding: 10px 0;
-            border: 1px solid black;
         }
 
         .students li {
-            padding: 3px 0;
+            padding: 1vh 0;
         }
 
         .row {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
-            margin: 50px;
+            margin: 10vh 2vw;
         }
 
         .seat {
-            height: 50px;
-            border: 1px solid black;
-            background-color: white;
             display: grid;
             place-items: center;
+            height: 10vh;
+            border: 1px solid black;
+            background-color: white;
             user-select: none;
-        }
-
-        .disabled {
-            background-color: gray;
         }
 
         .hamburger span {
@@ -53,31 +78,15 @@
             background: black;
         }
 
-        main {
-            text-align: center;
-            display: grid;
-            grid-template-columns: 0 1fr;
+
+        /* ボタンの状態 */
+        li button:disabled {
+            border: none;
+            color: inherit;
+            background-color: transparent;
         }
 
-        aside {
-            overflow: hidden;
-            background-color: white;
-        }
-
-        main.show {
-            grid-template-columns: 3fr 13fr;
-        }
-
-        input {
-            width: 85%;
-            height: 20px;
-            text-align: center;
-        }
-
-        select {
-            text-align: center;
-        }
-
+        .hidden,
         .count {
             display: none;
         }
@@ -86,22 +95,111 @@
             display: block;
         }
 
-        li button:disabled {
-            border: none;
-            background-color: transparent;
-            color: inherit;
-        }
-
         .selected {
             background-color: lightgreen;
         }
 
-        .unabled {
+        /* 席の状態 */
+        .disabled {
             background-color: gray;
         }
 
         .ladies {
             background-color: #FCE1E1;
+        }
+
+        @media screen and (max-width: 450px) and (orientation: portrait) {
+            body {
+                margin: 0;
+            }
+
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            main.show {
+                grid-template-columns: 1fr;
+            }
+
+            aside {
+                position: absolute;
+                top: -100%;
+                width: 100%;
+            }
+
+            main.show aside {
+                top: 40px;
+            }
+
+            form {
+                max-width: 400px;
+                margin-inline: auto;
+            }
+
+            input {
+                width: auto;
+                height: auto;
+            }
+
+            select[name="gender"] {
+                display: block;
+                margin-inline: auto;
+            }
+
+            .count.show {
+                display: none;
+            }
+
+            .seat {
+                writing-mode: vertical-lr;
+            }
+
+            button[type="submit"] {
+                display: inline-block;
+            }
+        }
+
+        @media screen and (max-height: 450px) and (orientation: landscape) {
+            body {
+                margin: 0;
+            }
+
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            main.show {
+                grid-template-columns: 1fr;
+            }
+
+            aside {
+                position: absolute;
+                top: -100%;
+                width: 100%;
+            }
+
+            main.show aside {
+                top: 40px;
+            }
+
+            form {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                max-width: 400px;
+                margin-inline: auto;
+            }
+
+            input {
+                width: auto;
+            }
+
+            .count.show {
+                display: none;
+            }
+
+            button[type="submit"] {
+                display: inline-block;
+            }
         }
     </style>
 </head>
@@ -117,18 +215,18 @@
         <aside>
             <form>
                 <select name="gender" required>
-                    <option value="">性別を選択</option>
+                    <option value="">――</option>
                     <option value="male">男性</option>
                     <option value="female">女性</option>
                 </select>
                 <input type="text" name="name">
-                <button type="submit" class="count"></button>
+                <button type="submit" hidden>追加</button>
             </form>
 
             <button data-mode="front">前列優先</button>
             <button data-mode="back">後列優先</button>
-            <button class="confirm" hidden>確定</button>
-            <button class="cancel" hidden>キャンセル</button>
+            <button class="confirm hidden">確定</button>
+            <button class="cancel hidden">キャンセル</button>
 
             <ul class="students">
             </ul>
@@ -208,8 +306,6 @@
     <script src="Student.js"></script>
     <script src="List.js"></script>
 
-    <script src="uncategorized.js"></script>
-
     <script>
         let List = load("List");
         countStudents();
@@ -232,7 +328,7 @@
             modeButton.addEventListener("click", () => {
                 mode = modeButton.dataset.mode;
                 otherButtons.forEach(button => {
-                    button.toggleAttribute("hidden");
+                    button.classList.toggle("hidden");
                 })
                 const nameButtons = document.querySelectorAll("li button");
                 nameButtons.forEach((button) => {
@@ -251,7 +347,7 @@
 
         cancelBtn.addEventListener("click", () => {
             otherButtons.forEach(button => {
-                button.toggleAttribute("hidden");
+                button.classList.toggle("hidden");
             })
             displayStudents();
         })
@@ -276,7 +372,7 @@
             save(List, "List");
             displayStudents();
             otherButtons.forEach(button => {
-                button.toggleAttribute("hidden");
+                button.classList.toggle("hidden");
             })
         })
 
